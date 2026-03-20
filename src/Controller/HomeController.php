@@ -27,19 +27,17 @@ class HomeController extends AbstractController
     }
 
     #[Route('/guests/{id}', name: 'guest')]
-    public function guest(int $id, EntityManagerInterface $entityManager)
+    public function guest(User $guest)
     {
-        $guest = $entityManager->getRepository(User::class)->find($id);
         return $this->render('front/guest.html.twig', [
             'guest' => $guest
         ]);
     }
 
     #[Route('/portfolio/{id}', name: 'portfolio')]
-    public function portfolio(EntityManagerInterface $entityManager, ?int $id = null)
+    public function portfolio( EntityManagerInterface $entityManager, ?Album $album = null)
     {
         $albums = $entityManager->getRepository(Album::class)->findAll();
-        $album = $id ? $entityManager->getRepository(Album::class)->find($id) : null;
         $user = $entityManager->getRepository(User::class)->findOneByAdmin(true);
 
         $medias = $album
