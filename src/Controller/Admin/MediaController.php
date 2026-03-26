@@ -11,61 +11,70 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class MediaController extends AbstractController
 {
-    #[Route('/admin/media', name: 'admin_media_index')]
-    public function index(Request $request, EntityManagerInterface $entityManager)
-    {
-        $page = $request->query->getInt('page', 1);
+  #[Route('/admin/media', name: 'admin_media_index')]
+  public function index(Request $request, EntityManagerInterface $entityManager)
+  {
+    $page = $request->query->getInt('page', 1);
 
-        $criteria = [];
+    $criteria = [];
 
-        if (!$this->isGranted('ROLE_ADMIN')) {
-            $criteria['user'] = $this->getUser();
-        }
-
-        $medias = $entityManager->getRepository(Media::class)->findBy(
-            $criteria,
-            ['id' => 'ASC'],
-            25,
-            25 * ($page - 1)
-        );
-        $total = $entityManager->getRepository(Media::class)->count([]);
-
-        return $this->render('admin/media/index.html.twig', [
-            'medias' => $medias,
-            'total' => $total,
-            'page' => $page
-        ]);
+    if (!$this->isGranted('ROLE_ADMIN')) {
+      $criteria['user'] = $this->getUser();
     }
 
-    #[Route('/admin/media/add', name: 'admin_media_add')]
-    public function add(Request $request, EntityManagerInterface $entityManager)
-    {
-        $media = new Media();
-        $form = $this->createForm(MediaType::class, $media, ['is_admin' => $this->isGranted('ROLE_ADMIN')]);
-        $form->handleRequest($request);
+    $medias = $entityManager->getRepository(Media::class)->findBy(
+      $criteria,
+      ['id' => 'ASC'],
+      25,
+      25 * ($page - 1)
+    );
+    $total = $entityManager->getRepository(Media::class)->count([]);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            if (!$this->isGranted('ROLE_ADMIN')) {
-                $media->setUser($this->getUser());
-            }
-            $media->setPath('uploads/' . md5(uniqid()) . '.' . $media->getFile()->guessExtension());
-            $media->getFile()->move('uploads/', $media->getPath());
-            $entityManager->persist($media);
-            $entityManager->flush();
+    return $this->render('admin/media/index.html.twig', [
+      'medias' => $medias,
+      'total' => $total,
+      'page' => $page
+    ]);
+  }
 
-            return $this->redirectToRoute('admin_media_index');
-        }
+  #[Route('/admin/media/add', name: 'admin_media_add')]
+  public function add(Request $request, EntityManagerInterface $entityManager)
+  {
+    $media = new Media();
+    $form = $this->createForm(MediaType::class, $media, ['is_admin' => $this->isGranted('ROLE_ADMIN')]);
+    $form->handleRequest($request);
 
-        return $this->render('admin/media/add.html.twig', ['form' => $form->createView()]);
+    if ($form->isSubmitted() && $form->isValid()) {
+      if (!$this->isGranted('ROLE_ADMIN')) {
+        $media->setUser($this->getUser());
+      }
+
+      $file = $media->getFile();
+
+      if ($file) {
+        $filename = md5(uniqid()) . '.' . $file->guessExtension();
+
+        $file->move('uploads/', $filename);
+
+        $media->setPath('uploads/' . $filename);
+      }
+
+      $entityManager->persist($media);
+      $entityManager->flush();
+
+      return $this->redirectToRoute('admin_media_index');
     }
 
-    #[Route('/admin/media/delete/{id}', name: 'admin_media_delete')]
-    public function delete(Media $media, EntityManagerInterface $entityManager)
-    {
-        $entityManager->remove($media);
-        $entityManager->flush();
-        unlink($media->getPath());
+    return $this->render('admin/media/add.html.twig', ['form' => $form->createView()]);
+  }
 
-        return $this->redirectToRoute('admin_media_index');
-    }
+  #[Route('/admin/media/delete/{id}', name: 'admin_media_delete')]
+  public function delete(Media $media, EntityManagerInterface $entityManager)
+  {
+    $entityManager->remove($media);
+    $entityManager->flush();
+    unlink($media->getPath());
+
+    return $this->redirectToRoute('admin_media_index');
+  }
 }
