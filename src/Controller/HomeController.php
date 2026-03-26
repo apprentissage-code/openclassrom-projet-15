@@ -34,7 +34,7 @@ class HomeController extends AbstractController
         ]);
     }
 
-    #[Route('/portfolio/{id}', name: 'portfolio')]
+    #[Route('/portfolio/{id?}', name: 'portfolio')]
     public function portfolio( EntityManagerInterface $entityManager, ?Album $album = null)
     {
         $albums = $entityManager->getRepository(Album::class)->findAll();
