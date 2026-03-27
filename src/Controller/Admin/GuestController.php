@@ -14,6 +14,7 @@ class GuestController extends AbstractController
   #[Route('/admin/guest', name: 'admin_guest_index')]
   public function index(EntityManagerInterface $entityManager)
   {
+    $this->denyAccessUnlessGranted('ROLE_ADMIN');
     $guests = $entityManager->getRepository(User::class)->getGuest();
 
     return $this->render('admin/guests/index.html.twig', ['guests' => $guests]);
