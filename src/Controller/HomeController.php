@@ -20,7 +20,7 @@ class HomeController extends AbstractController
   #[Route('/guests', name: 'guests')]
   public function guests(EntityManagerInterface $entityManager)
   {
-    $guests = $entityManager->getRepository(User::class)->getGuest();
+    $guests = $entityManager->getRepository(User::class)->getGuestActive();
 
     return $this->render('front/guests.html.twig', [
       'guests' => $guests

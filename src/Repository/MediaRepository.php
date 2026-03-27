@@ -2,7 +2,9 @@
 
 namespace App\Repository;
 
+use App\Entity\Album;
 use App\Entity\Media;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,33 +18,55 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class MediaRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, Media::class);
-    }
+  public function __construct(ManagerRegistry $registry)
+  {
+    parent::__construct($registry, Media::class);
+  }
 
-//    /**
-//     * @return Media[] Returns an array of Media objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('m')
-//            ->andWhere('m.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('m.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+  public function findByAlbum(Album $album)
+  {
+    return $this->createQueryBuilder('m')
+      ->join('m.user', 'u')
+      ->where('m.album = :album')
+      ->andWhere('u.isBlocked = false')
+      ->setParameter('album', $album)
+      ->getQuery()
+      ->getResult();
+  }
 
-//    public function findOneBySomeField($value): ?Media
-//    {
-//        return $this->createQueryBuilder('m')
-//            ->andWhere('m.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+  public function findByUser(User $user)
+  {
+    return $this->createQueryBuilder('m')
+      ->join('m.user', 'u')
+      ->where('m.user = :user')
+      ->andWhere('u.isBlocked = false')
+      ->setParameter('user', $user)
+      ->getQuery()
+      ->getResult();
+  }
+
+  //    /**
+  //     * @return Media[] Returns an array of Media objects
+  //     */
+  //    public function findByExampleField($value): array
+  //    {
+  //        return $this->createQueryBuilder('m')
+  //            ->andWhere('m.exampleField = :val')
+  //            ->setParameter('val', $value)
+  //            ->orderBy('m.id', 'ASC')
+  //            ->setMaxResults(10)
+  //            ->getQuery()
+  //            ->getResult()
+  //        ;
+  //    }
+
+  //    public function findOneBySomeField($value): ?Media
+  //    {
+  //        return $this->createQueryBuilder('m')
+  //            ->andWhere('m.exampleField = :val')
+  //            ->setParameter('val', $value)
+  //            ->getQuery()
+  //            ->getOneOrNullResult()
+  //        ;
+  //    }
 }

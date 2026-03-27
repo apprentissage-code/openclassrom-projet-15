@@ -44,42 +44,29 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
   {
     $users = $this->findAll();
 
-    return array_filter($users, function ($user) {
-      return !in_array('ROLE_ADMIN', $user->getRoles());
-    });
+    return array_filter($users, fn(User $u) => !in_array('ROLE_ADMIN', $u->getRoles()));
   }
 
-  public function getAdmin(): array
+  public function getGuestActive(): array
+  {
+    $users = $this->createQueryBuilder('u')
+      ->where('u.isBlocked = false')
+      ->getQuery()
+      ->getResult();
+
+    return array_filter($users, fn(User $u) => !in_array('ROLE_ADMIN', $u->getRoles()));
+  }
+
+  public function getAdmin(): ?User
   {
     $users = $this->findAll();
 
-    return array_filter($users, function ($user) {
-      return in_array('ROLE_ADMIN', $user->getRoles());
-    });
+    foreach ($users as $user) {
+      if (in_array('ROLE_ADMIN', $user->getRoles())) {
+        return $user;
+      }
+    }
+
+    return null;
   }
-
-  //    /**
-  //     * @return User[] Returns an array of User objects
-  //     */
-  //    public function findByExampleField($value): array
-  //    {
-  //        return $this->createQueryBuilder('u')
-  //            ->andWhere('u.exampleField = :val')
-  //            ->setParameter('val', $value)
-  //            ->orderBy('u.id', 'ASC')
-  //            ->setMaxResults(10)
-  //            ->getQuery()
-  //            ->getResult()
-  //        ;
-  //    }
-
-  //    public function findOneBySomeField($value): ?User
-  //    {
-  //        return $this->createQueryBuilder('u')
-  //            ->andWhere('u.exampleField = :val')
-  //            ->setParameter('val', $value)
-  //            ->getQuery()
-  //            ->getOneOrNullResult()
-  //        ;
-  //    }
 }
