@@ -36,6 +36,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
   #[ORM\Column]
   private string $password;
 
+  #[ORM\Column(type: 'boolean', options: ['default' => false])]
+  private bool $isBlocked = false;
+
   public function __construct()
   {
     $this->medias = new ArrayCollection();
@@ -118,4 +121,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
   }
 
   public function eraseCredentials(): void {}
+
+  public function isBlocked(): bool
+  {
+    return $this->isBlocked;
+  }
+
+  public function setIsBlocked(bool $isBlocked): self
+  {
+    $this->isBlocked = $isBlocked;
+    return $this;
+  }
 }

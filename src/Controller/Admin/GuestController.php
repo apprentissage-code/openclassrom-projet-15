@@ -24,18 +24,18 @@ class GuestController extends AbstractController
   #[Route('/admin/guest/add', name: 'admin_guest_add')]
   public function add(Request $request, EntityManagerInterface $entityManager)
   {
-      $guest = new User();
-      $form = $this->createForm(UserType::class, $guest);
-      $form->handleRequest($request);
+    $guest = new User();
+    $form = $this->createForm(UserType::class, $guest);
+    $form->handleRequest($request);
 
-      if ($form->isSubmitted() && $form->isValid()) {
-          $entityManager->persist($guest);
-          $entityManager->flush();
+    if ($form->isSubmitted() && $form->isValid()) {
+      $entityManager->persist($guest);
+      $entityManager->flush();
 
-          return $this->redirectToRoute('admin_guest_index');
-      }
+      return $this->redirectToRoute('admin_guest_index');
+    }
 
-      return $this->render('admin/guests/addOrupdate.html.twig', ['form' => $form->createView()]);
+    return $this->render('admin/guests/addOrupdate.html.twig', ['form' => $form->createView()]);
   }
 
 
@@ -59,6 +59,20 @@ class GuestController extends AbstractController
   {
     $entityManager->remove($user);
     $entityManager->flush();
+
+    return $this->redirectToRoute('admin_guest_index');
+  }
+
+  #[Route('/admin/guest/block/{id}', name: 'admin_guest_block')]
+  public function block(User $user, EntityManagerInterface $entityManager)
+  {
+    $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+    $user->setIsBlocked(!$user->isBlocked());
+
+    $entityManager->flush();
+
+    $this->addFlash('success', $user->isBlocked() ? 'Invité bloqué' : 'Invité débloqué');
 
     return $this->redirectToRoute('admin_guest_index');
   }
