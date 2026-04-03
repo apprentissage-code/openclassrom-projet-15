@@ -6,14 +6,15 @@ use App\Entity\Album;
 use App\Entity\Media;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class MediaFixtures extends Fixture
+class MediaFixtures extends Fixture implements DependentFixtureInterface
 {
   public function load(ObjectManager $manager): void
   {
     $data = [
-      [ 2, 'uploads/0051.jpg', 'Titre 0', null],
+      [2, 'uploads/0051.jpg', 'Titre 0', 1],
       [
         2,
         'uploads/0052.jpg',
@@ -30,19 +31,19 @@ class MediaFixtures extends Fixture
         2,
         'uploads/0054.jpg',
         'Titre 3',
-        null
+        2
       ],
       [
         2,
         'uploads/0055.jpg',
         'Titre 4',
-        null
+        2
       ],
       [
         2,
         'uploads/0056.jpg',
         'Titre 5',
-        null
+        2
       ],
       [
         2,
@@ -102,37 +103,37 @@ class MediaFixtures extends Fixture
         2,
         'uploads/0066.jpg',
         'Titre 15',
-        null
+        3
       ],
       [
         2,
         'uploads/0067.jpg',
         'Titre 16',
-        null
+        3
       ],
       [
         2,
         'uploads/0068.jpg',
         'Titre 17',
-        null
+        3
       ],
       [
         2,
         'uploads/0069.jpg',
         'Titre 18',
-        null
+        3
       ],
       [
         2,
         'uploads/0070.jpg',
         'Titre 19',
-        null
+        3
       ],
       [
         2,
         'uploads/0071.jpg',
         'Titre 20',
-        null
+        3
       ],
     ];
 
@@ -149,5 +150,12 @@ class MediaFixtures extends Fixture
     }
 
     $manager->flush();
+  }
+
+  public function getDependencies(): array
+  {
+    return [
+      AlbumFixtures::class,
+    ];
   }
 }
