@@ -7,6 +7,7 @@ use App\Form\UserType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 class GuestController extends AbstractController
@@ -22,13 +23,20 @@ class GuestController extends AbstractController
 
 
   #[Route('/admin/guest/add', name: 'admin_guest_add')]
-  public function add(Request $request, EntityManagerInterface $entityManager)
+  public function add(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher)
   {
     $guest = new User();
     $form = $this->createForm(UserType::class, $guest);
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
+      $hashedPassword = $passwordHasher->hashPassword(
+        $guest,
+        $guest->getPassword()
+      );
+
+      $guest->setPassword($hashedPassword);
+
       $entityManager->persist($guest);
       $entityManager->flush();
 
@@ -40,12 +48,19 @@ class GuestController extends AbstractController
 
 
   #[Route('/admin/guest/update/{id}', name: 'admin_guest_update')]
-  public function update(User $user, Request $request, EntityManagerInterface $entityManager)
+  public function update(User $user, Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher)
   {
     $form = $this->createForm(UserType::class, $user);
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
+      $hashedPassword = $passwordHasher->hashPassword(
+        $user,
+        $user->getPassword()
+      );
+
+      $user->setPassword($hashedPassword);
+
       $entityManager->flush();
 
       return $this->redirectToRoute('admin_guest_index');

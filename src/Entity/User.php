@@ -19,7 +19,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
   private ?int $id = null;
 
   #[ORM\Column]
-  private ?string $name;
+  private ?string $name = null;
 
   #[ORM\Column(type: 'text', nullable: true)]
   private ?string $description;
@@ -27,7 +27,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
   #[ORM\Column(length: 180, unique: true)]
   private ?string $email = null;
 
-  #[ORM\OneToMany(targetEntity: Media::class, mappedBy: 'user', cascade: ['remove'])]
+  #[ORM\OneToMany(targetEntity: Media::class, mappedBy: 'user', cascade: ['remove'], orphanRemoval: true)]
   private Collection $medias;
 
   #[ORM\Column]
