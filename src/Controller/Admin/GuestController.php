@@ -43,7 +43,7 @@ class GuestController extends AbstractController
       return $this->redirectToRoute('admin_guest_index');
     }
 
-    return $this->render('admin/guests/addOrupdate.html.twig', ['form' => $form->createView()]);
+    return $this->render('admin/guests/addOrUpdate.html.twig', ['form' => $form->createView()]);
   }
 
 
@@ -66,7 +66,7 @@ class GuestController extends AbstractController
       return $this->redirectToRoute('admin_guest_index');
     }
 
-    return $this->render('admin/guests/addOrupdate.html.twig', ['form' => $form->createView()]);
+    return $this->render('admin/guests/addOrUpdate.html.twig', ['form' => $form->createView()]);
   }
 
   #[Route('/admin/guest/delete/{id}', name: 'admin_guest_delete')]
