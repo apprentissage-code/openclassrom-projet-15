@@ -56,5 +56,4 @@ class PageAdminTest extends WebTestCase
     $this->assertSelectorTextContains('main h1', 'Medias');
   }
 
-
 }

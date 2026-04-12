@@ -18,9 +18,7 @@ class MediaController extends AbstractController
 
     $criteria = [];
 
-    if (!$this->isGranted('ROLE_ADMIN')) {
-      $criteria['user'] = $this->getUser();
-    }
+    $criteria['user'] = $this->getUser();
 
     $medias = $entityManager->getRepository(Media::class)->findBy(
       $criteria,
@@ -45,9 +43,7 @@ class MediaController extends AbstractController
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
-      if (!$this->isGranted('ROLE_ADMIN')) {
-        $media->setUser($this->getUser());
-      }
+      $media->setUser($this->getUser());
 
       $file = $media->getFile();
 

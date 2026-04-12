@@ -8,37 +8,36 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class AddMediaTest extends WebTestCase
 {
-    public function testAddMediaForm()
-    {
-        $client = static::createClient();
+  public function testAddMediaForm()
+  {
+    $client = static::createClient();
 
-        $admin = static::getContainer()->get(UserRepository::class)
-            ->findOneBy(['email' => 'admin@test.com']);
+    $admin = static::getContainer()->get(UserRepository::class)
+      ->findOneBy(['email' => 'admin@test.com']);
 
-        $client->loginUser($admin);
+    $client->loginUser($admin);
 
-        $crawler = $client->request('GET', '/admin/media/add');
+    $crawler = $client->request('GET', '/admin/media/add');
 
-        $this->assertResponseIsSuccessful();
+    $this->assertResponseIsSuccessful();
 
-        $this->assertSelectorExists('form');
+    $this->assertSelectorExists('form');
 
-        $file = new UploadedFile(
-            __DIR__ . '/fixtures/test.jpg',
-            'test.jpg',
-            'image/jpeg',
-            null,
-            true
-        );
+    $file = new UploadedFile(
+      __DIR__ . '/fixtures/test.jpg',
+      'test.jpg',
+      'image/jpeg',
+      null,
+      true
+    );
 
-        $form = $crawler->selectButton('Ajouter')->form();
-        $form['media[user]'] = $admin->getId();
-        $form['media[album]'] = '1';
-        $form['media[title]'] = 'test upload';
-        $form['media[file]'] = $file;
+    $form = $crawler->selectButton('Ajouter')->form();
+    $form['media[album]'] = '1';
+    $form['media[title]'] = 'test upload';
+    $form['media[file]'] = $file;
 
-        $client->submit($form);
+    $client->submit($form);
 
-        $this->assertResponseRedirects('/admin/media');
-    }
+    $this->assertResponseRedirects('/admin/media');
+  }
 }
