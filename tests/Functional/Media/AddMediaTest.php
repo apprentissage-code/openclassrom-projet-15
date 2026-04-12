@@ -32,6 +32,7 @@ class AddMediaTest extends WebTestCase
         );
 
         $form = $crawler->selectButton('Ajouter')->form();
+        $form['media[user]'] = $admin->getId();
         $form['media[album]'] = '1';
         $form['media[title]'] = 'test upload';
         $form['media[file]'] = $file;
