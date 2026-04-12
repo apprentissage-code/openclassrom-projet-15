@@ -91,6 +91,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     $this->medias = $medias;
   }
 
+  public function addMedia(Media $media): self
+  {
+    if (!$this->medias->contains($media)) {
+      $this->medias[] = $media;
+      $media->setUser($this);
+    }
+
+    return $this;
+  }
+
   public function getRoles(): array
   {
     $roles = $this->roles;
