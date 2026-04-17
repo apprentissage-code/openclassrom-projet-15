@@ -47,14 +47,31 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     return array_filter($users, fn(User $u) => !in_array('ROLE_ADMIN', $u->getRoles()));
   }
 
-  public function getGuestActive(): array
+  public function getGuestActiveWithMediaCount(): array
   {
-    $users = $this->createQueryBuilder('u')
+    $results = $this->createQueryBuilder('u')
+      ->leftJoin('u.medias', 'm')
+      ->addSelect('COUNT(m.id) AS mediaCount')
       ->where('u.isBlocked = false')
+      ->groupBy('u.id')
       ->getQuery()
       ->getResult();
 
-    return array_filter($users, fn(User $u) => !in_array('ROLE_ADMIN', $u->getRoles()));
+    $guests = [];
+
+    foreach ($results as $row) {
+        /** @var User $user */
+        $user = $row[0];
+
+        if (!in_array('ROLE_ADMIN', $user->getRoles())) {
+            $guests[] = [
+                'user' => $user,
+                'mediaCount' => $row['mediaCount']
+            ];
+        }
+    }
+
+    return $guests;
   }
 
   public function getAdmin(): ?User
