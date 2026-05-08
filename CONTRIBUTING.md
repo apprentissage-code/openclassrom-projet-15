@@ -85,7 +85,7 @@ git checkout -b feature/nom-feature
 
 Utiliser des messages de commit explicites.
 
-### Format recommandé
+Format recommandé :
 type: description
 
 ### Exemples
@@ -111,12 +111,12 @@ privilégier des méthodes courtes
 - privilégier les services Symfony.
 
 ## Structure du projet
-src/            -> Code source Symfony
-templates/      -> Templates Twig
-public/         -> Fichiers publics
-config/         -> Configuration Symfony
-migrations/     -> Migrations Doctrine
-tests/          -> Tests automatisés
+- src/            -> Code source Symfony
+- templates/      -> Templates Twig
+- public/         -> Fichiers publics
+- config/         -> Configuration Symfony
+- migrations/     -> Migrations Doctrine
+- tests/          -> Tests automatisés
 
 # Contribution aux tests
 
