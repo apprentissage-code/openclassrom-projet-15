@@ -1,4 +1,4 @@
-<img src="public/images/logo.png" alt="InaZaoui" width="200" />
+<img src="public/images/logo.png" alt="InaZaoui" />
 
 # Ina Zaoui
 
