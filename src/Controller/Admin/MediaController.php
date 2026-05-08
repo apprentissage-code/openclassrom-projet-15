@@ -7,7 +7,7 @@ use App\Form\MediaType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class MediaController extends AbstractController
 {
@@ -43,7 +43,9 @@ class MediaController extends AbstractController
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
-      $media->setUser($this->getUser());
+      /** @var \App\Entity\User $user */
+      $user = $this->getUser();
+      $media->setUser($user);
 
       $file = $media->getFile();
 

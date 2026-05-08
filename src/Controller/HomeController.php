@@ -3,11 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\Album;
-use App\Entity\Media;
 use App\Entity\User;
+use App\Repository\MediaRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class HomeController extends AbstractController
 {
@@ -18,9 +19,9 @@ class HomeController extends AbstractController
   }
 
   #[Route('/guests', name: 'guests')]
-  public function guests(EntityManagerInterface $entityManager)
+  public function guests(UserRepository $userRepository)
   {
-    $guests = $entityManager->getRepository(User::class)->getGuestActiveWithMediaCount();
+    $guests = $userRepository->getGuestActiveWithMediaCount();
 
     return $this->render('front/guests.html.twig', [
       'guests' => $guests
@@ -36,14 +37,14 @@ class HomeController extends AbstractController
   }
 
   #[Route('/portfolio/{id?}', name: 'portfolio')]
-  public function portfolio(EntityManagerInterface $entityManager, ?Album $album = null)
+  public function portfolio(EntityManagerInterface $entityManager, UserRepository $userRepository, MediaRepository $mediaRepository, ?Album $album = null)
   {
     $albums = $entityManager->getRepository(Album::class)->findAll();
-    $user = $entityManager->getRepository(User::class)->getAdmin();
+    $user = $userRepository->getAdmin();
 
     $medias = $album
-      ? $entityManager->getRepository(Media::class)->findByAlbum($album)
-      : $entityManager->getRepository(Media::class)->findByUser($user);
+      ? $mediaRepository->findByAlbum($album)
+      : $mediaRepository->findByUser($user);
     return $this->render('front/portfolio.html.twig', [
       'albums' => $albums,
       'album' => $album,

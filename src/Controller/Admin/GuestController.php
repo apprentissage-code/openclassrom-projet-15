@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Media;
 use App\Entity\User;
 use App\Form\UserType;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,10 +15,10 @@ use Symfony\Component\Routing\Attribute\Route;
 class GuestController extends AbstractController
 {
   #[Route('/admin/guest', name: 'admin_guest_index')]
-  public function index(EntityManagerInterface $entityManager)
+  public function index(UserRepository $userRepository)
   {
     $this->denyAccessUnlessGranted('ROLE_ADMIN');
-    $guests = $entityManager->getRepository(User::class)->getGuest();
+    $guests = $userRepository->getGuest();
 
     return $this->render('admin/guests/index.html.twig', ['guests' => $guests]);
   }

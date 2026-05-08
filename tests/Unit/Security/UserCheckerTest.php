@@ -38,8 +38,6 @@ class UserCheckerTest extends TestCase
     $user->setIsBlocked(false);
 
     $checker->checkPreAuth($user);
-
-    $this->assertTrue(true);
   }
 
   public function testCheckPostAuthDoesNotThrow(): void
@@ -53,7 +51,5 @@ class UserCheckerTest extends TestCase
     $user->setPassword('pass');
 
     $checker->checkPostAuth($user);
-
-    $this->assertTrue(true);
   }
 }
