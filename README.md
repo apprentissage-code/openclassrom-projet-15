@@ -3,7 +3,7 @@
 # Ina Zaoui
 
 ## Pré-requis
-* PHP >= 8.1
+* PHP >= 8.2
 * Composer
 * Extension PHP Xdebug
 * Symfony (binaire)
