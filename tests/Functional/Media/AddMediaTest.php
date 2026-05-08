@@ -33,14 +33,11 @@ class AddMediaTest extends WebTestCase
 
     $form = $crawler->selectButton('Ajouter')->form();
 
-    $form['media[album]'] = '1';
-    $form['media[title]'] = 'test upload';
-
     $client->submit($form, [
+      'media[album]' => '1',
+      'media[title]' => 'test upload',
       'media[file]' => $file,
     ]);
-
-    $client->submit($form);
 
     $this->assertResponseRedirects('/admin/media');
   }
