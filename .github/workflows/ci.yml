@@ -1,12 +1,32 @@
-name: Continuous Integration
+name: Symfony CI
 
 on:
   push:
   pull_request:
 
 jobs:
-  ci:
+  tests:
+    name: Tests Symfony
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: app_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      APP_ENV: test
+      DATABASE_URL: "postgresql://postgres:postgres@127.0.0.1:5432/app_test?serverVersion=16&charset=utf8"
 
     strategy:
       fail-fast: false
@@ -17,40 +37,49 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # ---------------- PHP ----------------
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
-          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_pgsql
           coverage: none
 
-      - name: Validate composer.json
-        run: composer validate --no-check-publish
-
-      - name: Cache Composer dependencies
+      # ---------------- Composer ----------------
+      - name: Cache Composer
         uses: actions/cache@v4
         with:
           path: vendor
-          key: php-${{ matrix.php-version }}-${{ hashFiles('composer.lock') }}
-          restore-keys: |
-            php-${{ matrix.php-version }}-
+          key: composer-${{ hashFiles('composer.lock') }}
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-progress --no-interaction
+        run: composer install --prefer-dist --no-interaction --no-progress
 
-      - name: Prepare test environment
-        run: |
-          cp .env .env.test.local || true
-          php bin/console cache:clear --env=test
-          php bin/console doctrine:database:create --env=test --if-not-exists
-          php bin/console doctrine:migrations:migrate -n --env=test || true
-          php bin/console doctrine:fixtures:load -n --env=test || true
+      # ---------------- DB WAIT ----------------
+      - name: Wait for PostgreSQL
+        run: sleep 5
 
+      # ---------------- Symfony ----------------
+      - name: Clear cache
+        run: php bin/console cache:clear --env=test
+
+      - name: Create database
+        run: php bin/console doctrine:database:create --env=test --if-not-exists
+
+      - name: Run migrations
+        run: php bin/console doctrine:migrations:migrate -n --env=test
+
+      - name: Load fixtures
+        run: php bin/console doctrine:fixtures:load -n --env=test
+
+      # ---------------- Assets ----------------
       - name: Build assets
         run: php bin/console sass:build || true
 
+      # ---------------- Tests ----------------
       - name: Run PHPUnit
         run: php bin/phpunit
 
+      # ---------------- Static analysis ----------------
       - name: Run PHPStan
         run: vendor/bin/phpstan analyse
