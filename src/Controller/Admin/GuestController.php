@@ -2,9 +2,9 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Media;
 use App\Entity\User;
 use App\Form\UserType;
+use App\Repository\MediaRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -72,9 +72,8 @@ class GuestController extends AbstractController
   }
 
   #[Route('/admin/guest/delete/{id}', name: 'admin_guest_delete')]
-  public function delete(User $user, EntityManagerInterface $entityManager)
+  public function delete(User $user, EntityManagerInterface $entityManager, MediaRepository $mediaRepository)
   {
-    $mediaRepository = $entityManager->getRepository(Media::class);
 
     $medias = $mediaRepository->findBy(['user' => $user]);
 
