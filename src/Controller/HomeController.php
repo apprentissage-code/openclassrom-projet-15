@@ -21,6 +21,7 @@ class HomeController extends AbstractController
   #[Route('/guests', name: 'guests')]
   public function guests(UserRepository $userRepository)
   {
+    //test
     $guests = $userRepository->getGuestActiveWithMediaCount();
 
     return $this->render('front/guests.html.twig', [
