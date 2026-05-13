@@ -4,9 +4,9 @@ namespace App\Controller;
 
 use App\Entity\Album;
 use App\Entity\User;
+use App\Repository\AlbumRepository;
 use App\Repository\MediaRepository;
 use App\Repository\UserRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -21,7 +21,6 @@ class HomeController extends AbstractController
   #[Route('/guests', name: 'guests')]
   public function guests(UserRepository $userRepository)
   {
-    //test
     $guests = $userRepository->getGuestActiveWithMediaCount();
 
     return $this->render('front/guests.html.twig', [
@@ -38,9 +37,13 @@ class HomeController extends AbstractController
   }
 
   #[Route('/portfolio/{id?}', name: 'portfolio')]
-  public function portfolio(EntityManagerInterface $entityManager, UserRepository $userRepository, MediaRepository $mediaRepository, ?Album $album = null)
-  {
-    $albums = $entityManager->getRepository(Album::class)->findAll();
+  public function portfolio(
+    AlbumRepository $albumRepository,
+    UserRepository $userRepository,
+    MediaRepository $mediaRepository,
+    ?Album $album = null
+  ) {
+    $albums = $albumRepository->findAll();
     $user = $userRepository->getAdmin();
 
     $medias = $album
