@@ -13,12 +13,13 @@ class DeleteAlbumTest extends WebTestCase
   {
     $client = static::createClient();
 
-    $admin = static::getContainer()->get(UserRepository::class)
-      ->findOneBy(['email' => 'admin@test.com']);
+    $container = static::getContainer();
+    $userRepository = $container->get(UserRepository::class);
+    $albumRepository = $container->get(AlbumRepository::class);
+    $entityManager = $container->get('doctrine')->getManager();
 
+    $admin = $userRepository->findOneBy(['email' => 'admin@test.com']);
     $client->loginUser($admin);
-
-    $entityManager = static::getContainer()->get('doctrine')->getManager();
 
     $album = new Album();
     $album->setName('Album à supprimer');
@@ -26,13 +27,18 @@ class DeleteAlbumTest extends WebTestCase
     $entityManager->persist($album);
     $entityManager->flush();
 
-    $albumID = $album->getId();
+    $albumId = $album->getId();
 
-    $client->request('GET', '/admin/album/' . $albumID . '/delete');
+    $countBefore = $albumRepository->count([]);
+
+    $client->request('POST', '/admin/album/' . $albumId . '/delete');
 
     $this->assertResponseRedirects('/admin/album');
 
-    $deletedAlbum = static::getContainer()->get(AlbumRepository::class)->find($albumID);
-    $this->assertNull($deletedAlbum);
+    $countAfter = $albumRepository->count([]);
+
+    $this->assertSame($countBefore - 1, $countAfter);
+
+    $this->assertNull($albumRepository->find($albumId));
   }
 }
