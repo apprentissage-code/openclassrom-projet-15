@@ -79,14 +79,35 @@ class DeleteOrBlockGuestTest extends WebTestCase
 
     $id = $user->getId();
 
+    $crawler = $client->request('GET', '/admin/guest');
+
+    $this->assertResponseIsSuccessful();
+
+    $this->assertStringContainsString(
+      'Bloquer',
+      $client->getResponse()->getContent()
+    );
+
     $client->request('POST', '/admin/guest/' . $id . '/block');
 
-    $blocked = $userRepository->find($id);
-    $this->assertTrue($blocked->isBlocked());
+    $this->assertResponseRedirects('/admin/guest');
+
+    $crawler = $client->followRedirect();
+
+    $this->assertStringContainsString(
+      'Débloquer',
+      $client->getResponse()->getContent()
+    );
 
     $client->request('POST', '/admin/guest/' . $id . '/block');
 
-    $unblocked = $userRepository->find($id);
-    $this->assertFalse($unblocked->isBlocked());
+    $this->assertResponseRedirects('/admin/guest');
+
+    $crawler = $client->followRedirect();
+
+    $this->assertStringContainsString(
+      'Bloquer',
+      $client->getResponse()->getContent()
+    );
   }
 }
