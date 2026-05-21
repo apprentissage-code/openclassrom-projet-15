@@ -38,7 +38,7 @@ class AlbumController extends AbstractController
     }
 
 
-    #[Route('/admin/album/update/{id}', name: 'admin_album_update')]
+    #[Route('/admin/album/{id}/update', name: 'admin_album_update')]
     public function update(Album $album, Request $request, EntityManagerInterface $entityManager)
     {
         $form = $this->createForm(AlbumType::class, $album);
@@ -53,7 +53,7 @@ class AlbumController extends AbstractController
         return $this->render('admin/album/update.html.twig', ['form' => $form->createView()]);
     }
 
-    #[Route('/admin/album/delete/{id}', name: 'admin_album_delete')]
+    #[Route('/admin/album/{id}/delete', name: 'admin_album_delete')]
     public function delete(Album $album, EntityManagerInterface $entityManager)
     {
         $entityManager->remove($album);

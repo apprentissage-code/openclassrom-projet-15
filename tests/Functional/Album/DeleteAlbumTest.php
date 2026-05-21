@@ -28,12 +28,11 @@ class DeleteAlbumTest extends WebTestCase
 
     $albumID = $album->getId();
 
-    $client->request('GET', '/admin/album/delete/' . $albumID);
+    $client->request('GET', '/admin/album/' . $albumID . '/delete');
 
     $this->assertResponseRedirects('/admin/album');
 
     $deletedAlbum = static::getContainer()->get(AlbumRepository::class)->find($albumID);
     $this->assertNull($deletedAlbum);
-
   }
 }

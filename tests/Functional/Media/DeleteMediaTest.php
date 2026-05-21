@@ -33,7 +33,7 @@ class DeleteMediaTest extends WebTestCase
 
     $mediaId = $media->getId();
 
-    $client->request('GET', '/admin/media/delete/' . $mediaId);
+    $client->request('GET', '/admin/media/' . $mediaId . '/delete');
 
     $this->assertResponseRedirects('/admin/media');
 

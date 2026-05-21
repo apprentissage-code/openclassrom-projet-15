@@ -46,7 +46,7 @@ class AddOrUpdateAlbumTest extends WebTestCase
     $entityManager->persist($album);
     $entityManager->flush();
 
-    $crawler = $client->request('GET', '/admin/album/update/' . $album->getId());
+    $crawler = $client->request('GET', '/admin/album/' . $album->getId() . '/update');
 
     $this->assertResponseIsSuccessful();
     $this->assertSelectorExists('form');

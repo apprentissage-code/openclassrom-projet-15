@@ -58,15 +58,15 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     $guests = [];
 
     foreach ($results as $row) {
-        /** @var User $user */
-        $user = $row[0];
+      /** @var User $user */
+      $user = $row[0];
 
-        if (!in_array('ROLE_ADMIN', $user->getRoles())) {
-            $guests[] = [
-                'user' => $user,
-                'mediaCount' => $row['mediaCount']
-            ];
-        }
+      if (!in_array('ROLE_ADMIN', $user->getRoles())) {
+        $guests[] = [
+          'user' => $user,
+          'mediaCount' => $row['mediaCount']
+        ];
+      }
     }
 
     return $guests;

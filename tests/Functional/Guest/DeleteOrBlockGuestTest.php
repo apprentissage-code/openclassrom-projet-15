@@ -2,10 +2,10 @@
 
 namespace App\Tests\Functional\Guest;
 
-use App\Entity\User;
 use App\Entity\Media;
-use App\Repository\UserRepository;
+use App\Entity\User;
 use App\Repository\MediaRepository;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class DeleteOrBlockGuestTest extends WebTestCase
@@ -46,7 +46,7 @@ class DeleteOrBlockGuestTest extends WebTestCase
 
     $mediaId = $media->getId();
 
-    $client->request('GET', '/admin/guest/delete/' . $userId);
+    $client->request('GET', '/admin/guest/' . $userId . '/delete');
 
     $this->assertResponseRedirects('/admin/guest');
 
@@ -83,14 +83,14 @@ class DeleteOrBlockGuestTest extends WebTestCase
 
     $id = $user->getId();
 
-    $client->request('GET', '/admin/guest/block/' . $id);
+    $client->request('GET', '/admin/guest/' . $id . '/block');
 
     $this->assertResponseRedirects('/admin/guest');
 
     $blocked = $entityManager->getRepository(\App\Entity\User::class)->find($id);
     $this->assertTrue($blocked->isBlocked());
 
-    $client->request('GET', '/admin/guest/block/' . $id);
+    $client->request('GET', '/admin/guest/' . $id . '/block');
 
     $unblocked = $entityManager->getRepository(\App\Entity\User::class)->find($id);
     $this->assertFalse($unblocked->isBlocked());

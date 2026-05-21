@@ -49,7 +49,7 @@ class GuestController extends AbstractController
   }
 
 
-  #[Route('/admin/guest/update/{id}', name: 'admin_guest_update')]
+  #[Route('/admin/guest/{id}/update', name: 'admin_guest_update')]
   public function update(User $user, Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher)
   {
     $form = $this->createForm(UserType::class, $user);
@@ -71,7 +71,7 @@ class GuestController extends AbstractController
     return $this->render('admin/guests/addOrUpdate.html.twig', ['form' => $form->createView()]);
   }
 
-  #[Route('/admin/guest/delete/{id}', name: 'admin_guest_delete')]
+  #[Route('/admin/guest/{id}/delete', name: 'admin_guest_delete')]
   public function delete(User $user, EntityManagerInterface $entityManager, MediaRepository $mediaRepository)
   {
 
@@ -91,7 +91,7 @@ class GuestController extends AbstractController
     return $this->redirectToRoute('admin_guest_index');
   }
 
-  #[Route('/admin/guest/block/{id}', name: 'admin_guest_block')]
+  #[Route('/admin/guest/{id}/block', name: 'admin_guest_block')]
   public function block(User $user, EntityManagerInterface $entityManager)
   {
     $this->denyAccessUnlessGranted('ROLE_ADMIN');
