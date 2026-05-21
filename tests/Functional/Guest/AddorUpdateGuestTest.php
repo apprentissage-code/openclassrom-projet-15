@@ -12,15 +12,17 @@ class AddOrUpdateGuestTest extends WebTestCase
   {
     $client = static::createClient();
 
-    $admin = static::getContainer()->get(UserRepository::class)
-      ->findOneBy(['email' => 'admin@test.com']);
+    $container = static::getContainer();
+    $userRepository = $container->get(UserRepository::class);
 
+    $admin = $userRepository->findOneBy(['email' => 'admin@test.com']);
     $client->loginUser($admin);
+
+    $countBefore = $userRepository->count([]);
 
     $crawler = $client->request('GET', '/admin/guest/new');
 
     $this->assertResponseIsSuccessful();
-
     $this->assertSelectorExists('form');
 
     $form = $crawler->selectButton('Ajouter')->form();
@@ -32,18 +34,22 @@ class AddOrUpdateGuestTest extends WebTestCase
     $client->submit($form);
 
     $this->assertResponseRedirects('/admin/guest');
+
+    $countAfter = $userRepository->count([]);
+
+    $this->assertSame($countBefore + 1, $countAfter);
   }
 
   public function testUpdateGuest()
   {
     $client = static::createClient();
 
-    $admin = static::getContainer()->get(UserRepository::class)
-      ->findOneBy(['email' => 'admin@test.com']);
+    $container = static::getContainer();
+    $entityManager = $container->get('doctrine')->getManager();
+    $userRepository = $container->get(UserRepository::class);
 
+    $admin = $userRepository->findOneBy(['email' => 'admin@test.com']);
     $client->loginUser($admin);
-
-    $entityManager = static::getContainer()->get('doctrine')->getManager();
 
     $user = new User();
     $user->setEmail('guest_update@test.com');
@@ -60,7 +66,6 @@ class AddOrUpdateGuestTest extends WebTestCase
     $this->assertSelectorExists('form');
 
     $form = $crawler->selectButton('Ajouter')->form();
-
     $form['user[email]'] = 'updated@test.com';
     $form['user[name]'] = 'Updated Name';
     $form['user[password]'] = 'newpassword';
@@ -69,10 +74,9 @@ class AddOrUpdateGuestTest extends WebTestCase
 
     $this->assertResponseRedirects('/admin/guest');
 
-    $updated = $entityManager->getRepository(User::class)
-      ->find($user->getId());
+    $updatedUser = $userRepository->find($user->getId());
 
-    $this->assertSame('updated@test.com', $updated->getEmail());
-    $this->assertSame('Updated Name', $updated->getName());
+    $this->assertSame('updated@test.com', $updatedUser->getEmail());
+    $this->assertSame('Updated Name', $updatedUser->getName());
   }
 }
