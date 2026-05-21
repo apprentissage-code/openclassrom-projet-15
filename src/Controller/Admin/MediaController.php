@@ -9,9 +9,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[Route('/admin/media', name: 'admin_media_')]
 class MediaController extends AbstractController
 {
-  #[Route('/admin/media', name: 'admin_media_index')]
+  #[Route('', name: 'index')]
   public function index(Request $request, EntityManagerInterface $entityManager)
   {
     $page = $request->query->getInt('page', 1);
@@ -35,7 +36,7 @@ class MediaController extends AbstractController
     ]);
   }
 
-  #[Route('/admin/media/add', name: 'admin_media_add')]
+  #[Route('/new', name: 'new')]
   public function add(Request $request, EntityManagerInterface $entityManager)
   {
     $media = new Media();
@@ -66,7 +67,7 @@ class MediaController extends AbstractController
     return $this->render('admin/media/add.html.twig', ['form' => $form->createView()]);
   }
 
-  #[Route('/admin/media/{id}/delete', name: 'admin_media_delete')]
+  #[Route('/{id}/delete', name: 'delete')]
   public function delete(Media $media, EntityManagerInterface $entityManager)
   {
     $entityManager->remove($media);

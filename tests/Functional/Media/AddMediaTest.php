@@ -17,7 +17,7 @@ class AddMediaTest extends WebTestCase
 
     $client->loginUser($admin);
 
-    $crawler = $client->request('GET', '/admin/media/add');
+    $crawler = $client->request('GET', '/admin/media/new');
 
     $this->assertResponseIsSuccessful();
 
