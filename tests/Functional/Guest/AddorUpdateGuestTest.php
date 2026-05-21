@@ -17,7 +17,7 @@ class AddOrUpdateGuestTest extends WebTestCase
 
     $client->loginUser($admin);
 
-    $crawler = $client->request('GET', '/admin/guest/add');
+    $crawler = $client->request('GET', '/admin/guest/new');
 
     $this->assertResponseIsSuccessful();
 

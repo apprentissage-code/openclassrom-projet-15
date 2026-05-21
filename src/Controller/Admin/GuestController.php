@@ -12,9 +12,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[Route('/admin/guest', name: 'admin_guest_')]
 class GuestController extends AbstractController
 {
-  #[Route('/admin/guest', name: 'admin_guest_index')]
+  #[Route('', name: 'index', methods: ['GET'])]
   public function index(UserRepository $userRepository)
   {
     $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -24,7 +25,7 @@ class GuestController extends AbstractController
   }
 
 
-  #[Route('/admin/guest/add', name: 'admin_guest_add')]
+  #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
   public function add(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher)
   {
     $guest = new User();
@@ -49,7 +50,7 @@ class GuestController extends AbstractController
   }
 
 
-  #[Route('/admin/guest/{id}/update', name: 'admin_guest_update')]
+  #[Route('/{id}/update', name: 'update', methods: ['GET', 'POST'])]
   public function update(User $user, Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher)
   {
     $form = $this->createForm(UserType::class, $user);
@@ -71,7 +72,7 @@ class GuestController extends AbstractController
     return $this->render('admin/guests/addOrUpdate.html.twig', ['form' => $form->createView()]);
   }
 
-  #[Route('/admin/guest/{id}/delete', name: 'admin_guest_delete')]
+  #[Route('/{id}/delete', name: 'delete')]
   public function delete(User $user, EntityManagerInterface $entityManager, MediaRepository $mediaRepository)
   {
 
@@ -91,7 +92,7 @@ class GuestController extends AbstractController
     return $this->redirectToRoute('admin_guest_index');
   }
 
-  #[Route('/admin/guest/{id}/block', name: 'admin_guest_block')]
+  #[Route('/{id}/block', name: 'block')]
   public function block(User $user, EntityManagerInterface $entityManager)
   {
     $this->denyAccessUnlessGranted('ROLE_ADMIN');
