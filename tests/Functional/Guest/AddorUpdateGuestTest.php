@@ -54,7 +54,7 @@ class AddOrUpdateGuestTest extends WebTestCase
     $entityManager->persist($user);
     $entityManager->flush();
 
-    $crawler = $client->request('GET', '/admin/guest/update/' . $user->getId());
+    $crawler = $client->request('GET', '/admin/guest/' . $user->getId() . 'update/');
 
     $this->assertResponseIsSuccessful();
     $this->assertSelectorExists('form');
