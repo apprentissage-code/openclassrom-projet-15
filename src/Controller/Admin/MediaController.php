@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/admin/media', name: 'admin_media_')]
 class MediaController extends AbstractController
 {
-  #[Route('', name: 'index')]
+  #[Route('', name: 'index', methods: ['GET'])]
   public function index(Request $request, EntityManagerInterface $entityManager)
   {
     $page = $request->query->getInt('page', 1);
@@ -36,7 +36,7 @@ class MediaController extends AbstractController
     ]);
   }
 
-  #[Route('/new', name: 'new')]
+  #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
   public function add(Request $request, EntityManagerInterface $entityManager)
   {
     $media = new Media();
@@ -67,7 +67,7 @@ class MediaController extends AbstractController
     return $this->render('admin/media/add.html.twig', ['form' => $form->createView()]);
   }
 
-  #[Route('/{id}/delete', name: 'delete')]
+  #[Route('/{id}/delete', name: 'delete', methods: ['POST'])]
   public function delete(Media $media, EntityManagerInterface $entityManager)
   {
     $entityManager->remove($media);

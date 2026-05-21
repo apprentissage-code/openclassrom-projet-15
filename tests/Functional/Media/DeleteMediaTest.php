@@ -13,12 +13,13 @@ class DeleteMediaTest extends WebTestCase
   {
     $client = static::createClient();
 
-    $admin = static::getContainer()->get(UserRepository::class)
-      ->findOneBy(['email' => 'admin@test.com']);
+    $container = static::getContainer();
+    $entityManager = $container->get('doctrine')->getManager();
+    $userRepository = $container->get(UserRepository::class);
+    $mediaRepository = $container->get(MediaRepository::class);
 
+    $admin = $userRepository->findOneBy(['email' => 'admin@test.com']);
     $client->loginUser($admin);
-
-    $entityManager = static::getContainer()->get('doctrine')->getManager();
 
     $tmpFile = tempnam(sys_get_temp_dir(), 'media_test');
     file_put_contents($tmpFile, 'dummy content');
@@ -33,12 +34,15 @@ class DeleteMediaTest extends WebTestCase
 
     $mediaId = $media->getId();
 
-    $client->request('GET', '/admin/media/' . $mediaId . '/delete');
+    $countBefore = $mediaRepository->count([]);
+
+    $client->request('POST', '/admin/media/' . $mediaId . '/delete');
 
     $this->assertResponseRedirects('/admin/media');
 
-    $deletedMedia = static::getContainer()->get(MediaRepository::class)->find($mediaId);
-    $this->assertNull($deletedMedia);
+    $this->assertSame($countBefore - 1, $mediaRepository->count([]));
+
+    $this->assertNull($mediaRepository->find($mediaId));
 
     $this->assertFileDoesNotExist($tmpFile);
   }
