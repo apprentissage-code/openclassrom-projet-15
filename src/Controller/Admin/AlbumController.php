@@ -4,23 +4,25 @@ namespace App\Controller\Admin;
 
 use App\Entity\Album;
 use App\Form\AlbumType;
+use App\Repository\AlbumRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[Route('/admin/album', name: 'admin_album_')]
 class AlbumController extends AbstractController
 {
-    #[Route('/admin/album', name: 'admin_album_index')]
-    public function index(EntityManagerInterface $entityManager)
+    #[Route('', name: 'index', methods: ['GET'])]
+    public function index(AlbumRepository $albumRepository)
     {
-        $albums = $entityManager->getRepository(Album::class)->findAll();
+        $albums = $albumRepository->findAll();
 
         return $this->render('admin/album/index.html.twig', ['albums' => $albums]);
     }
 
 
-    #[Route('/admin/album/add', name: 'admin_album_add')]
+    #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
     public function add(Request $request, EntityManagerInterface $entityManager)
     {
         $album = new Album();
@@ -38,7 +40,7 @@ class AlbumController extends AbstractController
     }
 
 
-    #[Route('/admin/album/{id}/update', name: 'admin_album_update')]
+    #[Route('/{id}/update', name: 'update', methods: ['GET', 'POST'])]
     public function update(Album $album, Request $request, EntityManagerInterface $entityManager)
     {
         $form = $this->createForm(AlbumType::class, $album);
@@ -53,7 +55,7 @@ class AlbumController extends AbstractController
         return $this->render('admin/album/update.html.twig', ['form' => $form->createView()]);
     }
 
-    #[Route('/admin/album/{id}/delete', name: 'admin_album_delete')]
+    #[Route('/{id}/delete', name: 'delete')]
     public function delete(Album $album, EntityManagerInterface $entityManager)
     {
         $entityManager->remove($album);
