@@ -16,7 +16,7 @@ class AddOrUpdateAlbumTest extends WebTestCase
 
     $client->loginUser($admin);
 
-    $crawler = $client->request('GET', '/admin/album/add');
+    $crawler = $client->request('GET', '/admin/album/new');
 
     $this->assertResponseIsSuccessful();
 
