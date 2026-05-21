@@ -2,11 +2,14 @@
 
 namespace App\Tests\Functional\Album;
 
+use App\Entity\Album;
+use App\Repository\AlbumRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class AddOrUpdateAlbumTest extends WebTestCase
 {
+
   public function testAddAlbumForm()
   {
     $client = static::createClient();
@@ -16,17 +19,26 @@ class AddOrUpdateAlbumTest extends WebTestCase
 
     $client->loginUser($admin);
 
+    $container = static::getContainer();
+    $albumRepository = $container->get(AlbumRepository::class);
+
+    $countBefore = $albumRepository->count([]);
+
     $crawler = $client->request('GET', '/admin/album/new');
 
     $this->assertResponseIsSuccessful();
-
     $this->assertSelectorExists('form');
 
     $form = $crawler->selectButton('Ajouter')->form();
     $form['album[name]'] = 'Album Test';
+
     $client->submit($form);
 
     $this->assertResponseRedirects('/admin/album');
+
+    $countAfter = $albumRepository->count([]);
+
+    $this->assertSame($countBefore + 1, $countAfter);
   }
 
   public function testUpdateAlbumForm()
@@ -38,9 +50,11 @@ class AddOrUpdateAlbumTest extends WebTestCase
 
     $client->loginUser($admin);
 
-    $entityManager = static::getContainer()->get('doctrine')->getManager();
+    $container = static::getContainer();
+    $entityManager = $container->get('doctrine')->getManager();
+    $albumRepository = $container->get(AlbumRepository::class);
 
-    $album = new \App\Entity\Album();
+    $album = new Album();
     $album->setName('Album Original');
 
     $entityManager->persist($album);
@@ -57,5 +71,9 @@ class AddOrUpdateAlbumTest extends WebTestCase
     $client->submit($form);
 
     $this->assertResponseRedirects('/admin/album');
+
+    $updatedAlbum = $albumRepository->find($album->getId());
+
+    $this->assertSame('Album Modifié', $updatedAlbum->getName());
   }
 }
