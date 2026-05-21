@@ -72,7 +72,7 @@ class GuestController extends AbstractController
     return $this->render('admin/guests/addOrUpdate.html.twig', ['form' => $form->createView()]);
   }
 
-  #[Route('/{id}/delete', name: 'delete')]
+  #[Route('/{id}/delete', name: 'delete', methods: ['POST'])]
   public function delete(User $user, EntityManagerInterface $entityManager, MediaRepository $mediaRepository)
   {
 
@@ -92,7 +92,7 @@ class GuestController extends AbstractController
     return $this->redirectToRoute('admin_guest_index');
   }
 
-  #[Route('/{id}/block', name: 'block')]
+  #[Route('/{id}/block', name: 'block', methods: ['POST'])]
   public function block(User $user, EntityManagerInterface $entityManager)
   {
     $this->denyAccessUnlessGranted('ROLE_ADMIN');

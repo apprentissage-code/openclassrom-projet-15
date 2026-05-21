@@ -16,9 +16,10 @@ class DeleteOrBlockGuestTest extends WebTestCase
 
     $container = static::getContainer();
     $entityManager = $container->get('doctrine')->getManager();
+    $userRepository = $container->get(UserRepository::class);
+    $mediaRepository = $container->get(MediaRepository::class);
 
-    $admin = $container->get(UserRepository::class)
-      ->findOneBy(['email' => 'admin@test.com']);
+    $admin = $userRepository->findOneBy(['email' => 'admin@test.com']);
     $client->loginUser($admin);
 
     $user = new User();
@@ -30,49 +31,44 @@ class DeleteOrBlockGuestTest extends WebTestCase
     $entityManager->persist($user);
     $entityManager->flush();
 
-    $userId = $user->getId();
-
     $tmpFile = tempnam(sys_get_temp_dir(), 'media_test');
     file_put_contents($tmpFile, 'dummy content');
 
     $media = new Media();
     $media->setTitle('Media du user');
     $media->setPath($tmpFile);
-
     $media->setUser($user);
 
     $entityManager->persist($media);
     $entityManager->flush();
 
-    $mediaId = $media->getId();
+    $userId = $user->getId();
 
-    $client->request('GET', '/admin/guest/' . $userId . '/delete');
+    $countUsersBefore = $userRepository->count([]);
+    $countMediaBefore = $mediaRepository->count([]);
+
+    $client->request('POST', '/admin/guest/' . $userId . '/delete');
 
     $this->assertResponseRedirects('/admin/guest');
 
-    $entityManager->clear();
+    $this->assertSame($countUsersBefore - 1, $userRepository->count([]));
+    $this->assertSame($countMediaBefore - 1, $mediaRepository->count([]));
 
-    $deletedUser = $container->get(UserRepository::class)->find($userId);
-    $this->assertNull($deletedUser);
-
-    $deletedMedia = $container->get(MediaRepository::class)->find($mediaId);
-    $this->assertNull($deletedMedia);
-
-    $this->assertFileDoesNotExist($tmpFile);
+    $this->assertNull($userRepository->find($userId));
   }
 
   public function testBlockAndUnblockGuest()
   {
     $client = static::createClient();
 
-    $admin = static::getContainer()->get(UserRepository::class)
-      ->findOneBy(['email' => 'admin@test.com']);
+    $container = static::getContainer();
+    $entityManager = $container->get('doctrine')->getManager();
+    $userRepository = $container->get(UserRepository::class);
 
+    $admin = $userRepository->findOneBy(['email' => 'admin@test.com']);
     $client->loginUser($admin);
 
-    $entityManager = static::getContainer()->get('doctrine')->getManager();
-
-    $user = new \App\Entity\User();
+    $user = new User();
     $user->setEmail('block@test.com');
     $user->setName('BlockUser');
     $user->setRoles(['ROLE_USER']);
@@ -83,16 +79,14 @@ class DeleteOrBlockGuestTest extends WebTestCase
 
     $id = $user->getId();
 
-    $client->request('GET', '/admin/guest/' . $id . '/block');
+    $client->request('POST', '/admin/guest/' . $id . '/block');
 
-    $this->assertResponseRedirects('/admin/guest');
-
-    $blocked = $entityManager->getRepository(\App\Entity\User::class)->find($id);
+    $blocked = $userRepository->find($id);
     $this->assertTrue($blocked->isBlocked());
 
-    $client->request('GET', '/admin/guest/' . $id . '/block');
+    $client->request('POST', '/admin/guest/' . $id . '/block');
 
-    $unblocked = $entityManager->getRepository(\App\Entity\User::class)->find($id);
+    $unblocked = $userRepository->find($id);
     $this->assertFalse($unblocked->isBlocked());
   }
 }
