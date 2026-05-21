@@ -37,7 +37,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # ---------------- PHP ----------------
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -45,7 +44,6 @@ jobs:
           extensions: mbstring, xml, ctype, iconv, intl, pdo_pgsql
           coverage: none
 
-      # ---------------- Composer ----------------
       - name: Cache Composer
         uses: actions/cache@v4
         with:
@@ -55,11 +53,9 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
 
-      # ---------------- DB WAIT ----------------
       - name: Wait for PostgreSQL
         run: sleep 5
 
-      # ---------------- Symfony ----------------
       - name: Clear cache
         run: php bin/console cache:clear --env=test
 
@@ -72,14 +68,11 @@ jobs:
       - name: Load fixtures
         run: php bin/console doctrine:fixtures:load -n --env=test
 
-      # ---------------- Assets ----------------
       - name: Build assets
         run: php bin/console sass:build || true
 
-      # ---------------- Tests ----------------
       - name: Run PHPUnit
         run: php bin/phpunit
 
-      # ---------------- Static analysis ----------------
       - name: Run PHPStan
         run: vendor/bin/phpstan analyse
