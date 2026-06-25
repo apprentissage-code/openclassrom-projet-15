@@ -55,7 +55,7 @@ class AlbumController extends AbstractController
         return $this->render('admin/album/update.html.twig', ['form' => $form->createView()]);
     }
 
-    #[Route('/{id}/delete', name: 'delete', methods: ['POST'])]
+    #[Route('/{id}/delete', name: 'delete')]
     public function delete(Album $album, EntityManagerInterface $entityManager)
     {
         $entityManager->remove($album);

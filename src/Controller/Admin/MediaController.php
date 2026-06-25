@@ -67,7 +67,7 @@ class MediaController extends AbstractController
     return $this->render('admin/media/add.html.twig', ['form' => $form->createView()]);
   }
 
-  #[Route('/{id}/delete', name: 'delete', methods: ['POST'])]
+  #[Route('/{id}/delete', name: 'delete')]
   public function delete(Media $media, EntityManagerInterface $entityManager)
   {
     $entityManager->remove($media);
