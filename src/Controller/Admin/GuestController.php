@@ -92,7 +92,7 @@ class GuestController extends AbstractController
     return $this->redirectToRoute('admin_guest_index');
   }
 
-  #[Route('/{id}/block', name: 'block', methods: ['POST'])]
+  #[Route('/{id}/block', name: 'block')]
   public function block(User $user, EntityManagerInterface $entityManager)
   {
     $this->denyAccessUnlessGranted('ROLE_ADMIN');
