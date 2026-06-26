@@ -8,6 +8,7 @@ use App\Repository\MediaRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
@@ -26,24 +27,31 @@ class GuestController extends AbstractController
 
 
   #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
-  public function add(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher)
+  public function add(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher, UserRepository $userRepository)
   {
     $guest = new User();
     $form = $this->createForm(UserType::class, $guest);
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
-      $hashedPassword = $passwordHasher->hashPassword(
-        $guest,
-        $guest->getPassword()
-      );
 
-      $guest->setPassword($hashedPassword);
+      if ($userRepository->findOneBy(['email' => $guest->getEmail()])) {
+        $form->get('email')->addError(
+          new FormError('Cette adresse email est déjà utilisée.')
+        );
+      } else {
+        $hashedPassword = $passwordHasher->hashPassword(
+          $guest,
+          $guest->getPassword()
+        );
 
-      $entityManager->persist($guest);
-      $entityManager->flush();
+        $guest->setPassword($hashedPassword);
 
-      return $this->redirectToRoute('admin_guest_index');
+        $entityManager->persist($guest);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('admin_guest_index');
+      }
     }
 
     return $this->render('admin/guests/addOrUpdate.html.twig', ['form' => $form->createView()]);
