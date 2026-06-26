@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Media;
 use App\Form\MediaType;
+use App\Repository\MediaRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,21 +14,24 @@ use Symfony\Component\Routing\Attribute\Route;
 class MediaController extends AbstractController
 {
   #[Route('', name: 'index', methods: ['GET'])]
-  public function index(Request $request, EntityManagerInterface $entityManager)
+  public function index(Request $request, MediaRepository $mediaRepository)
   {
     $page = $request->query->getInt('page', 1);
 
     $criteria = [];
 
-    $criteria['user'] = $this->getUser();
+    if (!$this->isGranted('ROLE_ADMIN')) {
+      $criteria['user'] = $this->getUser();
+    }
 
-    $medias = $entityManager->getRepository(Media::class)->findBy(
+    $medias = $mediaRepository->findBy(
       $criteria,
       ['id' => 'ASC'],
       25,
       25 * ($page - 1)
     );
-    $total = $entityManager->getRepository(Media::class)->count([]);
+
+    $total = $mediaRepository->count($criteria);
 
     return $this->render('admin/media/index.html.twig', [
       'medias' => $medias,
