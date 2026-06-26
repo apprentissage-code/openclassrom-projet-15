@@ -48,9 +48,11 @@ class MediaController extends AbstractController
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
-      /** @var \App\Entity\User $user */
-      $user = $this->getUser();
-      $media->setUser($user);
+      if (!$this->isGranted('ROLE_ADMIN') || $media->getUser() === null) {
+        /** @var \App\Entity\User $user */
+        $user = $this->getUser();
+        $media->setUser($user);
+      }
 
       $file = $media->getFile();
 

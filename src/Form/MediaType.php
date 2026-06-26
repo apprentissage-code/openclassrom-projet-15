@@ -29,7 +29,7 @@ class MediaType extends AbstractType
             $builder
                 ->add('user', EntityType::class, [
                     'label' => 'Utilisateur',
-                    'required' => false,
+                    'required' => true,
                     'class' => User::class,
                     'choice_label' => 'name',
                 ])
